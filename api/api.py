@@ -1,18 +1,19 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/recipes.db'  # Updated database path
+
+# Ensure the 'instance' folder exists and set the database URI
+if not os.path.exists('instance'):
+    os.makedirs('instance')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/recipes.db'  # Database path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 CORS(app)  # Enable Cross-Origin Resource Sharing for all routes
-
-# Root route
-@app.route('/')
-def home():
-    return "Welcome to the Recipe API!"
 
 # Recipe model
 class Recipe(db.Model):
