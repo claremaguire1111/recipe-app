@@ -27,7 +27,7 @@ function App() {
   useEffect(() => {
     const fetchAllRecipes = async () => {
       try {
-        const response = await fetch("/api/recipes");
+        const response = await fetch("http://127.0.0.1:5001/api/recipes");
         if (response.ok) {
           const data = await response.json();
           setRecipes(data);
@@ -45,7 +45,7 @@ function App() {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/recipes", {
+      const response = await fetch("http://127.0.0.1:5001/api/recipes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -55,7 +55,6 @@ function App() {
 
       if (response.ok) {
         const data = await response.json();
-
         setRecipes([...recipes, data.recipe]);
 
         console.log("Recipe added successfully!");
@@ -68,7 +67,7 @@ function App() {
           instructions: "",
           servings: 1,
           description: "",
-          imageUrl:
+          image_url:
             "https://images.pexels.com/photos/9986228/pexels-photo-9986228.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
         });
       } else {
@@ -84,7 +83,7 @@ function App() {
     const { id } = selectedRecipe;
 
     try {
-      const response = await fetch(`/api/recipes/${id}`, {
+      const response = await fetch(`http://127.0.0.1:5001/api/recipes/${id}`, { // Corrected URL
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -94,12 +93,10 @@ function App() {
 
       if (response.ok) {
         const data = await response.json();
-
         setRecipes(
           recipes.map((recipe) => {
             if (recipe.id === id) {
-              // Return the saved data from the db
-              return data.recipe;
+              return data.recipe; // Return the saved data from the db
             }
             return recipe;
           })
@@ -117,7 +114,7 @@ function App() {
 
   const handleDeleteRecipe = async (recipeId) => {
     try {
-      const response = await fetch(`/api/recipes/${selectedRecipe.id}`, {
+      const response = await fetch(`http://127.0.0.1:5001/api/recipes/${recipeId}`, { // Corrected URL
         method: "DELETE"
       });
 
@@ -136,7 +133,6 @@ function App() {
   const handleSearch = () => {
     const searchResults = recipes.filter((recipe) => {
       const valuesToSearch = [recipe.title, recipe.ingredients, recipe.description];
-      // Check if the search term is included in any of the values and will return a boolean value
       return valuesToSearch.some((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
     });
 
