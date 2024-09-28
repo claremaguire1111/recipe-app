@@ -3,7 +3,6 @@ import Header from "./components/Header";
 import RecipeExcerpt from "./components/RecipeExcerpt";
 import NewRecipeForm from "./components/NewRecipeForm";
 import RecipeFull from "./components/RecipeFull";
-import ConfirmationModal from "./components/ConfirmationModal"; // Import the ConfirmationModal
 
 const App = () => {
   const [recipes, setRecipes] = useState([]);
@@ -17,7 +16,7 @@ const App = () => {
     image_url: "https://images.pexels.com/photos/9986228/pexels-photo-9986228.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
   });
   const [showNewRecipeForm, setShowNewRecipeForm] = useState(false);
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false); // New state for confirmation modal
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -44,6 +43,24 @@ const App = () => {
 
   const hideRecipeForm = () => {
     setShowNewRecipeForm(false);
+  };
+
+  const handleDeleteRecipe = async (recipeId) => {
+    try {
+      const response = await fetch(`/api/recipes/${recipeId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setRecipes(recipes.filter(recipe => recipe.id !== recipeId));
+        setSelectedRecipe(null);
+        console.log("Recipe deleted successfully");
+      } else {
+        console.error("Failed to delete recipe");
+      }
+    } catch (e) {
+      console.error("Something went wrong during the request:", e);
+    }
   };
 
   const handleNewRecipe = async (e, newRecipe) => {
@@ -78,32 +95,30 @@ const App = () => {
     }
   };
 
-  const handleDeleteRecipe = async (recipeId) => {
-    try {
-      const response = await fetch(`/api/recipes/${recipeId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setRecipes(recipes.filter(recipe => recipe.id !== recipeId));
-        setSelectedRecipe(null);
-        console.log("Recipe deleted successfully");
-      } else {
-        console.error("Failed to delete recipe:", response.status);
-      }
-    } catch (e) {
-      console.error("Something went wrong during the request:", e);
-    }
-  };
-
   const onUpdateForm = (e) => {
     const { name, value } = e.target;
     setNewRecipe({ ...newRecipe, [name]: value });
   };
 
+  const updateSearchTerm = (text) => {
+    setSearchTerm(text);
+  };
+
+  const handleSearch = () => {
+    const searchResults = recipes.filter((recipe) => {
+      const valuesToSearch = [recipe.title, recipe.ingredients, recipe.description];
+      return valuesToSearch.some(value =>
+        value.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+    return searchResults;
+  };
+
+  const displayedRecipes = searchTerm ? handleSearch() : recipes;
+
   return (
     <div className="app">
-      <Header showRecipeForm={showRecipeForm} />
+      <Header showRecipeForm={showRecipeForm} searchTerm={searchTerm} updateSearchTerm={updateSearchTerm} />
       {showNewRecipeForm ? (
         <NewRecipeForm 
           newRecipe={newRecipe} 
@@ -113,11 +128,12 @@ const App = () => {
         />
       ) : (
         <div className="recipe-list">
-          {recipes.map(recipe => (
+          {displayedRecipes.map(recipe => (
             <RecipeExcerpt 
               key={recipe.id} 
               recipe={recipe} 
               handleSelectRecipe={handleSelectRecipe}
+              handleDeleteRecipe={handleDeleteRecipe}
             />
           ))}
         </div>
@@ -126,15 +142,7 @@ const App = () => {
         <RecipeFull 
           selectedRecipe={selectedRecipe} 
           handleUnselectRecipe={handleUnselectRecipe} 
-          handleDeleteRecipe={handleDeleteRecipe} // Pass the delete function here
-          setShowConfirmationModal={setShowConfirmationModal} // New
-        />
-      )}
-      {showConfirmationModal && (
-        <ConfirmationModal
-          message="Are you sure? Once it's gone, it's gone."
-          onCancel={() => setShowConfirmationModal(false)}
-          onConfirm={() => handleDeleteRecipe(selectedRecipe.id)} // Confirm delete
+          handleDeleteRecipe={handleDeleteRecipe}
         />
       )}
     </div>
