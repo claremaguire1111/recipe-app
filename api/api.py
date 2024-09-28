@@ -1,8 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
+
+# Ensure the 'instance' folder exists and set the database URI
+if not os.path.exists('instance'):
+    os.makedirs('instance')
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/recipes.db'  # Database path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -115,4 +121,3 @@ def delete_recipe(recipe_id):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
-
