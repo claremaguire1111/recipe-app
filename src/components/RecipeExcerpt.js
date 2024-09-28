@@ -1,14 +1,16 @@
 import React from "react";
-import { truncateText } from "../helpers/utils"; // Import the utility function
+import { truncateText } from "../helpers/utils.js";
 
-const RecipeExcerpt = ({ recipe, handleSelectRecipe, handleDeleteRecipe }) => {
+const RecipeExcerpt = ({ recipe, handleSelectRecipe }) => {
   return (
-    <div className="recipe-excerpt">
+    <article className='recipe-card'>
+      <figure>
+        <img src={recipe.image_url} alt={recipe.title} />
+      </figure>
       <h2>{recipe.title}</h2>
-      <p>{truncateText(recipe.description)}</p> {/* Use truncateText function */}
+      <p className='flex-spacing'>Description: {truncateText(recipe.description, 20)}</p>
       <button onClick={() => handleSelectRecipe(recipe)}>View</button>
-      <button onClick={() => handleDeleteRecipe(recipe.id)}>Delete</button>
-    </div>
+    </article>
   );
 };
 

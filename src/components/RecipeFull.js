@@ -1,55 +1,77 @@
 import React, { useState } from "react";
-import { X } from "react-feather"; // Make sure this is imported
-import ConfirmationModal from "./ConfirmationModal"; // Add this line
+import EditRecipeForm from "./EditRecipeForm";
+import ConfirmationModal from "./ConfirmationModal";
+import { X, Edit2 as Edit } from "react-feather";
 
-const RecipeFull = ({ selectedRecipe, handleUnselectRecipe, handleDeleteRecipe }) => {
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+const RecipeFull = ({ selectedRecipe, handleUnselectRecipe, onUpdateForm, handleUpdateRecipe, handleDeleteRecipe }) => {
+  const [editing, setEditing] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModel] = useState(false);
 
-  return (
-    <div className="recipe-details">
-      <article>
-        <header>
-          <figure>
-            <img src={selectedRecipe.image_url} alt={selectedRecipe.title} />
-          </figure>
-          <h2>{selectedRecipe.title}</h2>
-          <div className="button-container">
-            <button className="edit-button">Edit</button>
-            <button className="cancel-button" onClick={handleUnselectRecipe}>
-              <X /> Close
-            </button>
-            <button 
-              className="delete-button" 
-              onClick={() => setShowConfirmationModal(true)}
-            >
-              Delete
-            </button>
-          </div>
-        </header>
+  const handleCancel = () => {
+    setEditing(false);
+  };
 
-        <h3>Description:</h3>
-        <p>{selectedRecipe.description}</p>
-
-        <h3>Ingredients:</h3>
-        <ul className="ingredient-list">
-          {selectedRecipe.ingredients.split(',').map((ingredient, index) => (
-            <li className="ingredient" key={index}>
-              {ingredient.trim()}
-            </li>
-          ))}
-        </ul>
-
-        <h3>Instructions:</h3>
-        <pre className="formatted-text">{selectedRecipe.instructions}</pre>
-
-        <h3>Servings: {selectedRecipe.servings}</h3>
-      </article>
-      {showConfirmationModal && (
+  if (showConfirmationModal) {
+    return (
+      <div className='recipe-details'>
         <ConfirmationModal
-          message="Are you sure you want to delete this recipe?"
-          onCancel={() => setShowConfirmationModal(false)}
-          onConfirm={() => handleDeleteRecipe(selectedRecipe.id)} // Confirm delete
+          message="Are you sure? Once it's gone, it's gone."
+          onCancel={() => setShowConfirmationModel(false)}
+          onConfirm={() => handleDeleteRecipe(selectedRecipe.id)}
         />
+      </div>
+    );
+  }
+  return (
+    <div className='recipe-details'>
+      {editing ? (
+        <EditRecipeForm
+          selectedRecipe={selectedRecipe}
+          onUpdateForm={onUpdateForm}
+          handleDeleteRecipe={handleDeleteRecipe}
+          handleCancel={handleCancel}
+          handleUpdateRecipe={handleUpdateRecipe}
+          showConfirmationModal={showConfirmationModal}
+        />
+      ) : (
+        <article>
+          <header>
+            <figure>
+              <img alt={selectedRecipe.title} src={selectedRecipe.image_url} />
+            </figure>
+            <h2>{selectedRecipe.title}</h2>
+            <div className='button-container'>
+              <button className='edit-button' onClick={() => setEditing(true)}>
+                <Edit />
+                Edit
+              </button>
+              <button className='cancel-button' onClick={() => handleUnselectRecipe(selectedRecipe)}>
+                <X /> Close
+              </button>
+              <button className='delete-button' onClick={() => setShowConfirmationModel(true)}>
+                Delete
+              </button>
+            </div>
+          </header>
+
+          <h3>Description:</h3>
+          <p>{selectedRecipe.description}</p>
+
+          <h3>Ingredients:</h3>
+
+          <ul className='ingredient-list'>
+            {selectedRecipe.ingredients.split(",").map((ingredient, index) => (
+              <li className='ingredient' key={index}>
+                {ingredient}
+              </li>
+            ))}
+          </ul>
+          <h3>Instructions:</h3>
+
+          <pre className='formatted-text'>{selectedRecipe.instructions}</pre>
+
+          <h3>Servings: {selectedRecipe.servings}</h3>
+        </article>
       )}
     </div>
   );
