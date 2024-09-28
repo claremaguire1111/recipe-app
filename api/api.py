@@ -8,6 +8,7 @@ app = Flask(__name__)
 # Ensure the 'instance' folder exists and set the database URI
 if not os.path.exists('instance'):
     os.makedirs('instance')
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/recipes.db'  # Database path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
