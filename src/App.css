@@ -440,6 +440,7 @@ header .new-recipe:hover {
   .recipe-list {
     gap: 3rem;
   }
+
   .recipe-card {
     flex: 0 0 calc(33.33% - 2rem);
   }
